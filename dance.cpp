@@ -78,7 +78,8 @@ int convertDance(string dance, string& instructions, int& badBeat) {
 					
 					// n=freeze of length
 					int n=0;
-					n = dance[i] * 10 + dance[i + 1];
+					n = (dance[i]-'0') * 10 + dance[i + 1]-'0';
+
 
 					// freeze of length is less than 2, return 3
 					if (n == 0 || n == 1) {
@@ -91,39 +92,40 @@ int convertDance(string dance, string& instructions, int& badBeat) {
 						return 3;
 					}
 					// freeze of length is at least 2
-					else{
+					else if ((i + 1 + 1 +1 + n) > dance.size()) {
+
+						// dance ends prematurely, return 2
+
+						int slash = 0;
+						for (int k = 0; k < dance.size(); k++) {
+							if (dance[k] == '/')
+								slash += 1;
+						}
+						badBeat = slash + 1;
+						return 2;
+					}
+					// while freeze is in effect, a beat not consisting of only a slash, return 4
+					else {
 						for (int j = 0; j < n; j++) {
-							// dance ends prematurely, return 2
-							if ((i + 1 + 1 + 1 + j + 1) == dance.size()) {
+							if (dance[i + 1 + 1 +1 + j] != '/') {
 								int slash = 0;
-								for (int k = 0; k < dance.size(); k++) {
-									if (dance[k] == '/')
-										slash += 1;
-								}
-								badBeat = slash + 1;
-								return 2;
-							}
-							// while freeze is in effect, a beat not consisting of only a slash, return 4
-							else if (dance[i + 1 + 1 + 1 + j] != '/') {
-								int slash = 0;
-								for (int k = 0; k < dance.size(); k++) {
+								for (int k = 0; k <= i + 1 + 1 +1+ j; k++) {
 									if (dance[k] == '/')
 										slash += 1;
 								}
 								badBeat = slash + 1;
 								return 4;
 							}
-							// convertable;
-							else {								
-								// 锣传								
-											int n = 0;
-											n = (dance[i]-'0') * 10 + (dance[i + 1]-'0');
-											for (int m = 0; m < n; m++)
-												convert += tolower(dance[i + 2]);
-											i += (2 + n);
-								 }								
-							}
 						}
+						badBeat = -999;
+					}
+					// return 0;					
+					// 锣传//Τbug!!!!!!!
+					for (int m = 0; m < n; m++) {
+						convert += tolower(dance[i + 1+1]);
+
+					}
+					i += (1+1 + n);
 					}			
 				// ㄢ计
 				// 计
@@ -144,41 +146,43 @@ int convertDance(string dance, string& instructions, int& badBeat) {
 						return 3;
 					}
 					// freeze of length is at least 2
-					else {
-						for (int j = 0; j < n; j++) {
-
+					else if ((i + 1 + 1 + n) > dance.size()){
+						
 							// dance ends prematurely, return 2
-							if ((i + 1 + 1 + j) >= dance.size()) {
+							
 								int slash = 0;
 								for (int k = 0; k < dance.size(); k++) {
 									if (dance[k] == '/')
 										slash += 1;
 								}
 								badBeat = slash + 1;
-								return 2;
-							}
-
-							// while freeze is in effect, a beat not consisting of only a slash, return 4
-							else if (dance[i + 1 + 1 + j] != '/') {
+								return 2;													
+					}
+					// while freeze is in effect, a beat not consisting of only a slash, return 4
+					else {
+						for (int j = 0; j < n; j++) {
+							if (dance[i + 1 + 1 + j] != '/') {
 								int slash = 0;
-								for (int k = 0; k < dance.size(); k++) {
+								for (int k = 0; k <= i + 1 + 1 + j; k++) {
 									if (dance[k] == '/')
 										slash += 1;
 								}
 								badBeat = slash + 1;
 								return 4;
-							}						
+							}
 						}
+						badBeat = -999;
 					}
 					// return 0;					
 					// 锣传//Τbug!!!!!!!
-					
-					for (int m = 0; m < n; m++)
+					for (int m = 0; m < n; m++) {
 						convert += tolower(dance[i + 1]);
-							i += (1 + n);
+					
 					}
+					i += (1 + n);
 				}
-			
+					
+			}		
 			else if (dance[i] == '/')
 				convert += '.';
 			else {
@@ -202,10 +206,19 @@ int main() {
 	ins = "WOW";  // so we can detect whether convertDance sets ins
 	bb = -999;    // so we can detect whether convertDance sets bb
 	////convertDance("10u///", ins, bb);
-	convertDance("3r//", ins, bb);
+	//convertDance("3r///", ins, bb);
+	//convertDance("3r//", ins, bb);
+	//convertDance("3r///2r/", ins, bb);
+	//convertDance("3r///2r//", ins, bb);
+	//convertDance("3r////2r//", ins, bb);
+	//convertDance("3r//u/2r//", ins, bb);
+	//convertDance("3r///u///u/2r//", ins, bb);
+	//convertDance("02u//", ins, bb);
+	//convertDance("10u/////////", ins, bb);
+	convertDance("10u//////////r/", ins, bb);
 	cout << ins << endl;
 	cout << bb << endl;
-	
+	cout << convertDance("10u//////////r/", ins, bb) << endl;
 	
 
 	//assert(convertDance("u//d/r///d/", ins, bb) == 0 && ins == "u.dr..d"  &&  bb == -999);
