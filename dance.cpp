@@ -4,62 +4,98 @@
 #include <cctype>
 using namespace std;
 
+// The function can check if the input character is a correct direction
+bool isdirection(char dir) {
+	if (dir == 'u' || dir == 'U' || dir == 'd' || dir == 'D' || dir == 'l' || dir == 'L' || dir == 'r' || dir == 'R')
+		return true;
+	else
+		return false;
+}
 
+// The function can check if "dance" is a syntactically correct string
 bool hasCorrectSyntax(string dance){
-	// while dance is empty string 
-	//if (dance == "")
-	//	return true;
-	// judge every character in dance
+
+	// Go through dance string from the first charracter to the last character
 	for (int i = 0; i < dance.size(); i++) {
-		if (dance[i] == 'u' || dance[i] == 'U' || dance[i] == 'd' || dance[i] == 'D' || dance[i] == 'l' || dance[i] == 'L' || dance[i] == 'r' || dance[i] == 'R') {
+
+		// If the ith character is a digit
+		if (isdigit(dance[i])) {
+
+			// If the ith character is not the last character of the string
 			if ((i + 1) != dance.size()) {
-				if (dance[i + 1] != '/')
+				// If the next character is neither a digit nor a direction, return false
+				if (!(isdigit(dance[i + 1])) && !isdirection(dance[i+1]))
 					return false;
-				
-			}
-			else
-				return false;
-		}
-		else if (isdigit(dance[i])) {
-			if ((i + 1) != dance.size()) {
-				if (!(isdigit(dance[i + 1])) && !(dance[i+1] == 'u' || dance[i+1] == 'U' || dance[i+1] == 'd' || dance[i+1] == 'D' || dance[i+1] == 'l' || dance[i+1] == 'L' || dance[i+1] == 'r' || dance[i+1] == 'R'))
-					return false;
+				// If the next character is a digit
 				else if (isdigit(dance[i + 1])) {
+					// If the next character is the last character of the string, return false
 					if ((i + 2) == dance.size())
 						return false;
-					else if (!(dance[i + 2] == 'u' || dance[i + 2] == 'U' || dance[i + 2] == 'd' || dance[i + 2] == 'D' || dance[i + 2] == 'l' || dance[i + 2] == 'L' || dance[i + 2] == 'r' || dance[i + 2] == 'R'))
+					// If the character after two digits is not a direction, return false
+					else if (!isdirection(dance[i+2]))
 						return false;
 					else {
+						// If there is no character after two digits and a direction, return false
 						if ((i + 3) == dance.size())
 							return false;
+						// If the character after two digits and a direction is not a '/', return false
 						else if (dance[i + 3] != '/')
 							return false;
 					}
 				}
+				// If the next character is a character
 				else {
+					// If the next character is the last character of the string, return false
 					if ((i + 2) == dance.size())
 						return false;
+					// If the character after a digit and a direction is not a '/', return false
 					else if (!(dance[i + 2] == '/'))
-						return false;
-					
+						return false;		
 				}
 			}
+			// If the ith character is the last character of the string, return false
 			else
 				return false;
 		}
+		// If the ith character is a direction
+		else if (isdirection(dance[i])) {
+			// If the ith character is not the last character of the string
+			if ((i + 1) != dance.size()) {
+				// If the character after a direction is not a '/', return false
+				if (dance[i + 1] != '/')
+					return false;
+			}
+			// If the ith character is the last character of the string, return false
+			else
+				return false;
+		}
+		// If the ith character is a '/', skip this checking
 		else if (dance[i] == '/') {
 			continue;
 		}
+
+		// If the ith character is neither a digit, nor a direction, nor a '/', return false
 		else
 			return false;
 	}
+	// After going through all the characters within string, if no error happened, we can pretty sure the syntax is correct and return true
 	return true;
 }
 
+/* 
+The function can judge if the string is convertible.
+If the string is convertible, the string will be converted an stored in instruction, the return value will be 0.
+If the string is not convertible:
+	If the string is not syntactically correct, the return value will be 1.
+	If the string is syntatically correct:
+		If the string ends prematurely, badBeat is set to one more than the number of beats in the string, and the return value will be 2.
+		If there is a beat specifies a freeze of length less than 2, badBeat is set to the number of that beat, and the return value will be 3.
+		If a freeze is in effect but a beat not consisting of only a slash is present, badBeat is set to the number of that beat, and the return value will be 4.
+*/
 int convertDance(string dance, string& instructions, int& badBeat) {
-	string convert = "";
 
-	// not syntactically correct, return 1
+	string convert = "";
+	// If the string is not syntactically correct, return 1
 	if (!hasCorrectSyntax(dance))
 		return 1;
 
@@ -68,34 +104,38 @@ int convertDance(string dance, string& instructions, int& badBeat) {
 		instructions = "";
 		return 0;
 	}
+
 	// sytactically correct
 	else {
+		// Go through dance string from the first charracter to the last character
 		for (int i = 0; i < dance.size(); i++) {
+
+			// If the ith character is a digit
 			if (isdigit(dance[i])) {
 				
-				// while freeze of length is two digits
+				// If the i+1th character is a digit (If this beat is two digits)
 				if (isdigit(dance[i + 1])) {
 					
 					// n=freeze of length
 					int n=0;
-					n = (dance[i]-'0') * 10 + dance[i + 1]-'0';
+					n = (dance[i]-'0') * 10 + dance[i + 1]-'0'; // Convert a character to a number
 
-
-					// freeze of length is less than 2, return 3
+					// If freeze of length is less than 2, return 3
 					if (n == 0 || n == 1) {
+						//  Count the number of '/' before ith position
 						int slash = 0;
 						for (int k = 0; k < i; k++) {
 							if (dance[k] == '/')
 								slash += 1;
 						}
+						// The badBeat is set to the number of this beat
 						badBeat = slash + 1;
 						return 3;
 					}
-					// freeze of length is at least 2
+					// If freeze of length is at least 2 but dance ends prematurely, return 2
 					else if ((i + 1 + 1 +1 + n) > dance.size()) {
 
-						// dance ends prematurely, return 2
-
+						// badBeat is set to one more than the number of beats in the string
 						int slash = 0;
 						for (int k = 0; k < dance.size(); k++) {
 							if (dance[k] == '/')
@@ -104,9 +144,12 @@ int convertDance(string dance, string& instructions, int& badBeat) {
 						badBeat = slash + 1;
 						return 2;
 					}
-					// while freeze is in effect, a beat not consisting of only a slash, return 4
+					// If freeze is in effect, but a beat is not consisting of only a slash, return 4
 					else {
+						// Use a for loop to check while in freeze effect, the position where should be occupied by a '/' is a '/' or other character
 						for (int j = 0; j < n; j++) {
+
+							// If the position where should be occupied by a '/' is occupied by another character, badBeat is set to the number of that beat and return 4
 							if (dance[i + 1 + 1 +1 + j] != '/') {
 								int slash = 0;
 								for (int k = 0; k <= i + 1 + 1 +1+ j; k++) {
@@ -117,50 +160,51 @@ int convertDance(string dance, string& instructions, int& badBeat) {
 								return 4;
 							}
 						}
-						badBeat = -999;
 					}
-					// return 0;					
-					// 锣传//Τbug!!!!!!!
+					
+					// If this beat with enough '/' is convertible, convert it and save it in variable "convert";					
 					for (int m = 0; m < n; m++) {
 						convert += tolower(dance[i + 1+1]);
 
 					}
-					i += (1+1 + n);
-					}			
-				// ㄢ计
-				// 计
-				// while freeze of length is one digits
+					// Jump i to the next character and skip the beat with its '/' that we have just converted
+				i += (1+1 + n);
+				}			
+				
+				// If the freeze of length is one digits
 				else {
 					// n=freeze of length
 					int n = 0;
-					n = dance[i]-'0';
+					n = dance[i]-'0'; //convert a character to a number
 
 					// freeze of length is less than 2, return 3
 					if (n == 0 || n == 1) {
+						//  Count the number of '/' before ith position
 						int slash = 0;
 						for (int k = 0; k < i; k++) {
 							if (dance[k] == '/')
 								slash += 1;
  						}
+						// The badBeat is set to the number of this beat
 						badBeat = slash + 1;
 						return 3;
 					}
-					// freeze of length is at least 2
+					//If freeze of length is at least 2 but dance ends prematurely, return 2
 					else if ((i + 1 + 1 + n) > dance.size()){
-						
-							// dance ends prematurely, return 2
-							
 								int slash = 0;
 								for (int k = 0; k < dance.size(); k++) {
 									if (dance[k] == '/')
 										slash += 1;
 								}
+								// badBeat is set to one more than the number of beats in the string
 								badBeat = slash + 1;
 								return 2;													
 					}
-					// while freeze is in effect, a beat not consisting of only a slash, return 4
+					// If freeze is in effect, but a beat is not consisting of only a slash, return 4
 					else {
+						// Use a for loop to check while in freeze effect, the position where should be occupied by a '/' is a '/' or other character
 						for (int j = 0; j < n; j++) {
+							// If the position where should be occupied by a '/' is occupied by another character, badBeat is set to the number of that beat and return 4
 							if (dance[i + 1 + 1 + j] != '/') {
 								int slash = 0;
 								for (int k = 0; k <= i + 1 + 1 + j; k++) {
@@ -171,26 +215,30 @@ int convertDance(string dance, string& instructions, int& badBeat) {
 								return 4;
 							}
 						}
-						badBeat = -999;
 					}
-					// return 0;					
-					// 锣传//Τbug!!!!!!!
+					// If this beat with enough '/' is convertible, convert it and save it in variable "convert";	
 					for (int m = 0; m < n; m++) {
 						convert += tolower(dance[i + 1]);
 					
 					}
+					// Jump i to the next character and skip the beat with its '/' that we have just converted
 					i += (1 + n);
 				}
 					
-			}		
+			}
+			// If the ith character is a '/'
 			else if (dance[i] == '/')
 				convert += '.';
+			// If the ith character is a direction
 			else {
 				convert += tolower(dance[i]);
+				// Jump i to the next character and skip the beat with its '/' that we have just converted
 				i += 1;
 			}
 		}
 	}
+
+// Save the converted string into variable instruction and return 0
 instructions = convert;
 return 0;
 }
@@ -218,12 +266,16 @@ int main() {
 
 	assert(!hasCorrectSyntax(" /"));
 	assert(!hasCorrectSyntax("u"));
+	assert(!hasCorrectSyntax("0.5u/"));
 	assert(!hasCorrectSyntax("0u"));
 	assert(!hasCorrectSyntax("01u"));
 	assert(!hasCorrectSyntax("3"));
 	assert(!hasCorrectSyntax("3u"));
+	assert(!hasCorrectSyntax("-3u/"));
 	assert(!hasCorrectSyntax("3 u/"));
+	assert(!hasCorrectSyntax("u3///"));
 	assert(!hasCorrectSyntax("10u"));
+	assert(!hasCorrectSyntax("999u/"));
 	assert(!hasCorrectSyntax("ud/"));
 	assert(!hasCorrectSyntax("u/d"));
 	assert(!hasCorrectSyntax("/u"));
@@ -281,6 +333,9 @@ int main() {
 	assert(convertDance("01u", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
 	ins = "WOW";
 	bb = -999;
+	assert(convertDance("0.5u/", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
 	assert(convertDance("3", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
 	ins = "WOW";
 	bb = -999;
@@ -288,6 +343,12 @@ int main() {
 	ins = "WOW";
 	bb = -999;
 	assert(convertDance("3 u/", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("-3u///", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("u3///", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
 	ins = "WOW";
 	bb = -999;
 	assert(convertDance("10u", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
