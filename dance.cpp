@@ -198,9 +198,38 @@ return 0;
 int main() {
 
 	assert(hasCorrectSyntax(""));
-	//cout << (hasCorrectSyntax("u/")) << endl;
-	//assert(!hasCorrectSyntax("d/z//"));
-	//assert(hasCorrectSyntax("d/u//jwoejc w"));
+	assert(hasCorrectSyntax(""));
+	assert(hasCorrectSyntax("u/"));
+	assert(hasCorrectSyntax("0u/"));
+	assert(hasCorrectSyntax("1u/"));
+	assert(hasCorrectSyntax("01u/"));
+	assert(hasCorrectSyntax("/u/"));
+	assert(hasCorrectSyntax("3u/"));
+	assert(hasCorrectSyntax("03u/"));
+	assert(hasCorrectSyntax("3u///"));
+	assert(hasCorrectSyntax("3u////"));
+	assert(hasCorrectSyntax("u/d/"));
+	assert(hasCorrectSyntax("R/L/U/D/"));
+	assert(hasCorrectSyntax("3u//d/"));
+	assert(hasCorrectSyntax("3u//d//"));
+	assert(hasCorrectSyntax("3u//2R/D/"));
+	assert(hasCorrectSyntax("3u/////2R//L/"));
+	assert(hasCorrectSyntax("10u/"));
+
+	assert(!hasCorrectSyntax(" /"));
+	assert(!hasCorrectSyntax("u"));
+	assert(!hasCorrectSyntax("0u"));
+	assert(!hasCorrectSyntax("01u"));
+	assert(!hasCorrectSyntax("3"));
+	assert(!hasCorrectSyntax("3u"));
+	assert(!hasCorrectSyntax("3 u/"));
+	assert(!hasCorrectSyntax("10u"));
+	assert(!hasCorrectSyntax("ud/"));
+	assert(!hasCorrectSyntax("u/d"));
+	assert(!hasCorrectSyntax("/u"));
+	assert(!hasCorrectSyntax("///////L"));
+	assert(!hasCorrectSyntax("R/L/U/D"));
+	
 	string ins;
 	int bb;
 	ins = "WOW";  // so we can detect whether convertDance sets ins
@@ -215,14 +244,125 @@ int main() {
 	//convertDance("3r///u///u/2r//", ins, bb);
 	//convertDance("02u//", ins, bb);
 	//convertDance("10u/////////", ins, bb);
-	convertDance("10u//////////r/", ins, bb);
+	/*convertDance("10u//////////r/", ins, bb);
+	convertDance(" /", ins, bb);
 	cout << ins << endl;
 	cout << bb << endl;
-	cout << convertDance("10u//////////r/", ins, bb) << endl;
+	cout << convertDance(" /", ins, bb) << endl;*/
+	
+	assert(convertDance("u/", ins, bb) == 0 && ins == "u"  &&  bb == -999);
+	assert(convertDance("2u//", ins, bb) == 0 && ins == "uu"  &&  bb == -999);
+	assert(convertDance("2U//", ins, bb) == 0 && ins == "uu"  &&  bb == -999);
+	assert(convertDance("2u///", ins, bb) == 0 && ins == "uu."  &&  bb == -999);
+	assert(convertDance("/u/", ins, bb) == 0 && ins == ".u"  &&  bb == -999);
+	assert(convertDance("u/d/", ins, bb) == 0 && ins == "ud"  &&  bb == -999);
+	assert(convertDance("u//d/", ins, bb) == 0 && ins == "u.d"  &&  bb == -999);
+	assert(convertDance("/u//d/", ins, bb) == 0 && ins == ".u.d"  &&  bb == -999);
+	assert(convertDance("u/d/l/r/", ins, bb) == 0 && ins == "udlr"  &&  bb == -999);
+	assert(convertDance("u/3d///l//r/", ins, bb) == 0 && ins == "udddl.r"  &&  bb == -999);
+
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance(" /", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("u", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("A", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("u/a/", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("0u", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("01u", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("3", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("3u", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("3 u/", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("10u", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("ud/", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("u/d", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("/u", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("///////L", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("R/L/U/D", ins, bb) == 1 && ins == "WOW"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+
+	assert(convertDance("2u/", ins, bb) == 2 && ins == "WOW"  &&  bb == 2);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("2u//3d/", ins, bb) == 2 && ins == "WOW"  &&  bb == 4);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("2u//3d//", ins, bb) == 2 && ins == "WOW"  &&  bb == 5);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("2u//3d///10L/", ins, bb) == 2 && ins == "WOW"  &&  bb == 7);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("03u///2r//5L//", ins, bb) == 2 && ins == "WOW"  &&  bb == 8);
+	ins = "WOW";
+	bb = -999;
+
+	assert(convertDance("0u/", ins, bb) == 3 && ins == "WOW"  &&  bb == 1);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("1u/", ins, bb) == 3 && ins == "WOW"  &&  bb == 1);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("/1u/", ins, bb) == 3 && ins == "WOW"  &&  bb == 2);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("2u//0D/", ins, bb) == 3 && ins == "WOW"  &&  bb == 3);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("2u//1D/", ins, bb) == 3 && ins == "WOW"  &&  bb == 3);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("2u//2D///1L/", ins, bb) == 3 && ins == "WOW"  &&  bb == 6);
+	ins = "WOW";
+	bb = -999;
+
+	assert(convertDance("2u/r/", ins, bb) == 4 && ins == "WOW"  &&  bb == 2);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("2u//r/3l//d/", ins, bb) == 4 && ins == "WOW"  &&  bb == 6);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("2u//r/3L///2U/R//", ins, bb) == 4 && ins == "WOW"  &&  bb == 8);
+	ins = "WOW";
+	bb = -999;
 	
 
-	//assert(convertDance("u//d/r///d/", ins, bb) == 0 && ins == "u.dr..d"  &&  bb == -999);
-	//assert(convertDance("u//d/3r///d/", ins, bb) == 0 && ins == "u.drrrd"  &&  bb == -999);
+
+
+
+	assert(convertDance("u//d/r///d/", ins, bb) == 0 && ins == "u.dr..d"  &&  bb == -999);
+	ins = "WOW";
+	bb = -999;
+	assert(convertDance("u//d/3r///d/", ins, bb) == 0 && ins == "u.drrrd"  &&  bb == -999);
+
 	//ins = "WOW";  // so we can detect whether convertDance sets ins
 	//bb = -999;    // so we can detect whether convertDance sets bb
 	//assert(convertDance("5r//", ins, bb) == 2 && ins == "WOW"  &&  bb == 3);
